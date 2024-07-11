@@ -100,14 +100,14 @@
         }
 
         function createMotif(scene) {
-            const colors = ['#ff0000', '#ff00ff', '#0000ff', '#00ffff', '#00ff00', '#ffff00']; // 濃い色に変更
-            const shapes = ['circle', 'rectangle', 'triangle'];
+            const colors = ['#fea5b2', '#ffcb9c', '#fff599', '#9dffde', '#eda9ed', '#a2a4ff']; // ペールトーンの色
+            const shapes = ['circle', 'rectangle', 'triangle', 'star', 'heart'];
             const motifCount = 10; // 一度に飛び出すモチーフの数
 
             for (let i = 0; i < motifCount; i++) {
                 const shapeType = shapes[Math.floor(Math.random() * shapes.length)];
                 const color = colors[Math.floor(Math.random() * colors.length)];
-                const size = Phaser.Math.Between(30, 100);
+                const size = Phaser.Math.Between(15, 50); // 大小様々で全体的に小さく
                 let motif;
 
                 if (shapeType === 'circle') {
@@ -116,15 +116,19 @@
                     motif = scene.add.rectangle(scene.cameras.main.centerX, scene.cameras.main.centerY, size * 1.5, size, Phaser.Display.Color.HexStringToColor(color).color);
                 } else if (shapeType === 'triangle') {
                     motif = scene.add.polygon(scene.cameras.main.centerX, scene.cameras.main.centerY, [0, -size, size, size, -size, size], Phaser.Display.Color.HexStringToColor(color).color);
+                } else if (shapeType === 'star') {
+                    motif = createStar(scene, scene.cameras.main.centerX, scene.cameras.main.centerY, 5, size, size / 2, color);
+                } else if (shapeType === 'heart') {
+                    motif = createHeart(scene, scene.cameras.main.centerX, scene.cameras.main.centerY, size, color);
                 }
 
                 motif.setDepth(-1); // 鍵盤の背面に配置
 
                 scene.tweens.add({
                     targets: motif,
-                    x: { value: Phaser.Math.Between(0, scene.sys.game.config.width), duration: 1500 },
-                    y: { value: Phaser.Math.Between(0, scene.sys.game.config.height), duration: 1500 },
-                    alpha: { value: 0, duration: 1500 },
+                    x: { value: Phaser.Math.Between(-50, scene.sys.game.config.width + 150), duration: 1500 }, // 画面の外に散らばる
+                    y: { value: Phaser.Math.Between(-50, scene.sys.game.config.height + 150), duration: 1500 }, // 画面の外に散らばる
+                    alpha: { value: 0.85, duration: 1500 }, // 完全に透過させず
                     scaleX: { value: 2, duration: 1500 },
                     scaleY: { value: 2, duration: 1500 },
                     ease: 'Cubic.easeOut',
@@ -133,6 +137,37 @@
                     }
                 });
             }
+        }
+
+        function createStar(scene, x, y, points, radius1, radius2, color) {
+            const star = scene.add.polygon(x, y, createStarPoints(points, radius1, radius2), Phaser.Display.Color.HexStringToColor(color).color);
+            return star;
+        }
+
+        function createStarPoints(points, radius1, radius2) {
+            const step = Math.PI / points;
+            const path = [];
+            for (let i = 0; i < 2 * points; i++) {
+                const radius = i % 2 === 0 ? radius1 : radius2;
+                const angle = i * step;
+                path.push(Math.cos(angle) * radius, Math.sin(angle) * radius);
+            }
+            return path;
+        }
+
+        function createHeart(scene, x, y, size, color) {
+            const heart = scene.add.polygon(x, y, createHeartPoints(size), Phaser.Display.Color.HexStringToColor(color).color);
+            return heart;
+        }
+
+        function createHeartPoints(size) {
+            return [
+                0, -size / 2,
+                size / 2, -size / 6,
+                size / 6, size / 2,
+                -size / 6, size / 2,
+                -size / 2, -size / 6
+            ];
         }
 
         function create() {
