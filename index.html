@@ -66,7 +66,7 @@
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
         // 音を鳴らす関数
-        function playSound(frequency) {
+        function playSound(frequency, scene) {
             const oscillator = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
 
@@ -89,11 +89,50 @@
 
             oscillator.start();
             oscillator.stop(audioCtx.currentTime + attack + decay + release); // アタック、ディケイ、サステイン、リリースを考慮した時間
+
+            // カラフルなモチーフを生成
+            createMotif(scene);
         }
 
         function preload() {
             // ここで必要なリソースを読み込む
             // 今回は特に何も読み込まないので空のまま
+        }
+
+        function createMotif(scene) {
+            const colors = ['#ff0000', '#ff00ff', '#0000ff', '#00ffff', '#00ff00', '#ffff00']; // 濃い色に変更
+            const shapes = ['circle', 'rectangle', 'triangle'];
+            const motifCount = 10; // 一度に飛び出すモチーフの数
+
+            for (let i = 0; i < motifCount; i++) {
+                const shapeType = shapes[Math.floor(Math.random() * shapes.length)];
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                const size = Phaser.Math.Between(30, 100);
+                let motif;
+
+                if (shapeType === 'circle') {
+                    motif = scene.add.circle(scene.cameras.main.centerX, scene.cameras.main.centerY, size, Phaser.Display.Color.HexStringToColor(color).color);
+                } else if (shapeType === 'rectangle') {
+                    motif = scene.add.rectangle(scene.cameras.main.centerX, scene.cameras.main.centerY, size * 1.5, size, Phaser.Display.Color.HexStringToColor(color).color);
+                } else if (shapeType === 'triangle') {
+                    motif = scene.add.polygon(scene.cameras.main.centerX, scene.cameras.main.centerY, [0, -size, size, size, -size, size], Phaser.Display.Color.HexStringToColor(color).color);
+                }
+
+                motif.setDepth(-1); // 鍵盤の背面に配置
+
+                scene.tweens.add({
+                    targets: motif,
+                    x: { value: Phaser.Math.Between(0, scene.sys.game.config.width), duration: 1500 },
+                    y: { value: Phaser.Math.Between(0, scene.sys.game.config.height), duration: 1500 },
+                    alpha: { value: 0, duration: 1500 },
+                    scaleX: { value: 2, duration: 1500 },
+                    scaleY: { value: 2, duration: 1500 },
+                    ease: 'Cubic.easeOut',
+                    onComplete: () => {
+                        motif.destroy();
+                    }
+                });
+            }
         }
 
         function create() {
@@ -122,8 +161,7 @@
                 // クリック処理
                 keyShape.on('pointerdown', () => {
                     console.log('Key clicked:', key);
-                    playSound(noteFrequencies[key]); // 音を鳴らす
-                    // モチーフを表示するなどのロジックを追加
+                    playSound(noteFrequencies[key], this); // 音を鳴らす
                 });
             });
 
@@ -140,8 +178,7 @@
                     // クリック処理
                     keyShape.on('pointerdown', () => {
                         console.log('Key clicked:', key);
-                        playSound(noteFrequencies[key]); // 音を鳴らす
-                        // モチーフを表示するなどのロジックを追加
+                        playSound(noteFrequencies[key], this); // 音を鳴らす
                     });
                 }
             });
