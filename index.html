@@ -69,7 +69,10 @@
                 const keyX = startX + index * keyWidth;
                 const keyShape = this.add.rectangle(keyX, startY, keyWidth, whiteKeyHeight, 0xffffff);
                 keyShape.setInteractive();
-                
+
+                // 黒い線で囲む
+                keyShape.setStrokeStyle(2, 0x000000); // 線の太さと色を設定
+
                 // クリック処理などを記述する場合はここに追加
                 keyShape.on('pointerdown', () => {
                     console.log('Key clicked:', key);
@@ -77,12 +80,13 @@
                 });
             });
 
+
             // 黒鍵盤を描画
             blackKeys.forEach((key, index) => {
                 const whiteKeyIndex = [0, 1, 3, 4, 5][index]; // 対応する白鍵盤のインデックスを取得
 
                 if (whiteKeyIndex !== undefined) {
-                    const whiteKeyX = startX + whiteKeyIndex * keyWidth;
+                    const whiteKeyX = startX - 7 + whiteKeyIndex * keyWidth;
                     const keyX = whiteKeyX + keyWidth * 0.65; // 黒鍵盤の幅を調整して配置
                     const keyShape = this.add.rectangle(keyX, startY - whiteKeyHeight / 6, keyWidth * 0.7, blackKeyHeight, 0x000000);
                     keyShape.setInteractive();
