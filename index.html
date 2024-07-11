@@ -27,8 +27,6 @@
 </head>
 <body>
     <script>
-        // Phaser.jsを使ったゲームのロジックを記述します
-
         // Phaserの設定
         const config = {
             type: Phaser.AUTO,
@@ -134,7 +132,7 @@
                     targets: motif,
                     x: { value: Phaser.Math.Between(-50, scene.sys.game.config.width + 150), duration: 1500 }, // 画面の外に散らばる
                     y: { value: Phaser.Math.Between(-50, scene.sys.game.config.height + 150), duration: 1500 }, // 画面の外に散らばる
-                    alpha: { value: 0.85, duration: 1500 }, // 完全に透過させず
+                    alpha: { value: 0, duration: 4000 }, // 最後に透明にして消える
                     scaleX: { value: 2, duration: 1500 },
                     scaleY: { value: 2, duration: 1500 },
                     ease: 'Cubic.easeOut',
