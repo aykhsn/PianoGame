@@ -115,11 +115,31 @@
                 let motif;
 
                 if (shapeType === 'circle') {
-                    motif = scene.add.circle(scene.cameras.main.centerX, scene.cameras.main.centerY, size, Phaser.Display.Color.HexStringToColor(color).color);
+                    motif = scene.add.graphics();
+                    motif.fillStyle(Phaser.Display.Color.HexStringToColor(color).color, 1);
+                    motif.fillCircle(scene.cameras.main.centerX, scene.cameras.main.centerY, size);
+                    motif.lineStyle(1, 0x000000, 1);
+                    motif.strokeCircle(scene.cameras.main.centerX, scene.cameras.main.centerY, size);
                 } else if (shapeType === 'rectangle') {
-                    motif = scene.add.rectangle(scene.cameras.main.centerX, scene.cameras.main.centerY, size * 1.5, size, Phaser.Display.Color.HexStringToColor(color).color);
+                    motif = scene.add.graphics();
+                    motif.fillStyle(Phaser.Display.Color.HexStringToColor(color).color, 1);
+                    motif.fillRoundedRect(scene.cameras.main.centerX - size * 0.75, scene.cameras.main.centerY - size * 0.5, size * 1.5, size, 10);
+                    motif.lineStyle(1, 0x000000, 1);
+                    motif.strokeRoundedRect(scene.cameras.main.centerX - size * 0.75, scene.cameras.main.centerY - size * 0.5, size * 1.5, size, 10);
                 } else if (shapeType === 'triangle') {
-                    motif = scene.add.polygon(scene.cameras.main.centerX, scene.cameras.main.centerY, [0, -size, size, size, -size, size], Phaser.Display.Color.HexStringToColor(color).color);
+                    motif = scene.add.graphics();
+                    motif.fillStyle(Phaser.Display.Color.HexStringToColor(color).color, 1);
+                    motif.fillPoints([
+                        { x: scene.cameras.main.centerX, y: scene.cameras.main.centerY - size },
+                        { x: scene.cameras.main.centerX + size, y: scene.cameras.main.centerY + size },
+                        { x: scene.cameras.main.centerX - size, y: scene.cameras.main.centerY + size }
+                    ]);
+                    motif.lineStyle(1, 0x000000, 1);
+                    motif.strokePoints([
+                        { x: scene.cameras.main.centerX, y: scene.cameras.main.centerY - size },
+                        { x: scene.cameras.main.centerX + size, y: scene.cameras.main.centerY + size },
+                        { x: scene.cameras.main.centerX - size, y: scene.cameras.main.centerY + size }
+                    ], true);
                 } else if (shapeType === 'star') {
                     motif = createStar(scene, scene.cameras.main.centerX, scene.cameras.main.centerY, 5, size, size / 2, color);
                 } else if (shapeType === 'heart') {
@@ -144,7 +164,14 @@
         }
 
         function createStar(scene, x, y, points, radius1, radius2, color) {
-            const star = scene.add.polygon(x, y, createStarPoints(points, radius1, radius2), Phaser.Display.Color.HexStringToColor(color).color);
+            const star = scene.add.graphics();
+            const path = createStarPoints(points, radius1, radius2);
+            star.fillStyle(Phaser.Display.Color.HexStringToColor(color).color, 1);
+            star.fillPoints(path, true);
+            star.lineStyle(1, 0x000000, 1);
+            star.strokePoints(path, true);
+            star.x = x;
+            star.y = y;
             return star;
         }
 
@@ -154,23 +181,29 @@
             for (let i = 0; i < 2 * points; i++) {
                 const radius = i % 2 === 0 ? radius1 : radius2;
                 const angle = i * step;
-                path.push(Math.cos(angle) * radius, Math.sin(angle) * radius);
+                path.push({ x: Math.cos(angle) * radius, y: Math.sin(angle) * radius });
             }
             return path;
         }
 
         function createHeart(scene, x, y, size, color) {
-            const heart = scene.add.polygon(x, y, createHeartPoints(size), Phaser.Display.Color.HexStringToColor(color).color);
+            const heart = scene.add.graphics();
+            heart.fillStyle(Phaser.Display.Color.HexStringToColor(color).color, 1);
+            heart.fillPoints(createHeartPoints(size), true);
+            heart.lineStyle(1, 0x000000, 1);
+            heart.strokePoints(createHeartPoints(size), true);
+            heart.x = x;
+            heart.y = y;
             return heart;
         }
 
         function createHeartPoints(size) {
             return [
-                0, -size / 2,
-                size / 2, -size / 6,
-                size / 6, size / 2,
-                -size / 6, size / 2,
-                -size / 2, -size / 6
+                { x: 0, y: -size / 2 },
+                { x: size / 2, y: -size / 6 },
+                { x: size / 6, y: size / 2 },
+                { x: -size / 6, y: size / 2 },
+                { x: -size / 2, y: -size / 6 }
             ];
         }
 
