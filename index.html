@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Piano Game</title>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            background-color: #ffccff; /* ライトピンクの背景色 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        // Phaser.jsを使ったゲームのロジックを記述します
+
+        // Phaserの設定
+        const config = {
+            type: Phaser.AUTO,
+            width: window.innerWidth, // ゲームの幅をウィンドウの幅に合わせる
+            height: window.innerHeight, // ゲームの高さをウィンドウの高さに合わせる
+            physics: {
+                default: 'arcade',
+                arcade: {
+                    gravity: { y: 0 },
+                    debug: false
+                }
+            },
+            scene: {
+                preload: preload,
+                create: create
+            }
+        };
+
+        // Phaserのインスタンスを作成
+        const game = new Phaser.Game(config);
+
+        function preload() {
+            // ここで必要なリソースを読み込む
+            // 今回は特に何も読み込まないので空のまま
+        }
+
+        function create() {
+            // ここでピアノの鍵盤を作成するロジックを記述する
+            const whiteKeys = ['ド', 'レ', 'ミ', 'ファ', 'ソ', 'ラ', 'シ', 'ド']; // 白鍵盤のキー
+            const blackKeys = ['ド#', 'レ#', 'ファ#', 'ソ#', 'ラ#']; // 黒鍵盤のキー
+
+            const keyWidth = 60; // 鍵盤の幅
+            const whiteKeyHeight = 200; // 白鍵盤の高さ
+            const blackKeyHeight = whiteKeyHeight * 2 / 3; // 黒鍵盤の高さ（白鍵盤の3分の2）
+
+            // 鍵盤を画面に配置するための計算
+            const totalKeys = whiteKeys.length;
+            const startX = window.innerWidth / 2 - (keyWidth * totalKeys) / 2;
+            const startY = window.innerHeight / 2;
+
+            // 白鍵盤を描画
+            whiteKeys.forEach((key, index) => {
+                const keyX = startX + index * keyWidth;
+                const keyShape = this.add.rectangle(keyX, startY, keyWidth, whiteKeyHeight, 0xffffff);
+                keyShape.setInteractive();
+                
+                // クリック処理などを記述する場合はここに追加
+                keyShape.on('pointerdown', () => {
+                    console.log('Key clicked:', key);
+                    // 音を鳴らす、モチーフを表示するなどのロジックを追加
+                });
+            });
+
+            // 黒鍵盤を描画
+            blackKeys.forEach((key, index) => {
+                const whiteKeyIndex = [0, 1, 3, 4, 5][index]; // 対応する白鍵盤のインデックスを取得
+
+                if (whiteKeyIndex !== undefined) {
+                    const whiteKeyX = startX + whiteKeyIndex * keyWidth;
+                    const keyX = whiteKeyX + keyWidth * 0.65; // 黒鍵盤の幅を調整して配置
+                    const keyShape = this.add.rectangle(keyX, startY - whiteKeyHeight / 6, keyWidth * 0.7, blackKeyHeight, 0x000000);
+                    keyShape.setInteractive();
+                    
+                    // クリック処理などを記述する場合はここに追加
+                    keyShape.on('pointerdown', () => {
+                        console.log('Key clicked:', key);
+                        // 音を鳴らす、モチーフを表示するなどのロジックを追加
+                    });
+                }
+            });
+        }
+    </script>
+</body>
+</html>
