@@ -45,6 +45,52 @@
         // Phaserのインスタンスを作成
         const game = new Phaser.Game(config);
 
+        // 音階と周波数の対応
+        const noteFrequencies = {
+            'ド': 261.63,
+            'レ': 293.66,
+            'ミ': 329.63,
+            'ファ': 349.23,
+            'ソ': 392.00,
+            'ラ': 440.00,
+            'シ': 493.88,
+            'ド#': 277.18,
+            'レ#': 311.13,
+            'ファ#': 369.99,
+            'ソ#': 415.30,
+            'ラ#': 466.16,
+            '高ド': 523.25 // 1オクターブ高いド
+        };
+
+        // AudioContextを初期化
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        // 音を鳴らす関数
+        function playSound(frequency) {
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            oscillator.type = 'square'; // 波形をスクエア波に設定
+            oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+            
+            const attack = 0.01; // アタックタイム
+            const decay = 0.05; // ディケイタイム
+            const sustain = 0.3; // サステインレベル
+            const release = 0.1; // リリースタイム
+
+            gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+            gainNode.gain.linearRampToValueAtTime(1, audioCtx.currentTime + attack);
+            gainNode.gain.linearRampToValueAtTime(sustain, audioCtx.currentTime + attack + decay);
+            gainNode.gain.setValueAtTime(sustain, audioCtx.currentTime + attack + decay);
+            gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + attack + decay + release);
+
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + attack + decay + release); // アタック、ディケイ、サステイン、リリースを考慮した時間
+        }
+
         function preload() {
             // ここで必要なリソースを読み込む
             // 今回は特に何も読み込まないので空のまま
@@ -52,17 +98,17 @@
 
         function create() {
             // ここでピアノの鍵盤を作成するロジックを記述する
-            const whiteKeys = ['ド', 'レ', 'ミ', 'ファ', 'ソ', 'ラ', 'シ', 'ド']; // 白鍵盤のキー
+            const whiteKeys = ['ド', 'レ', 'ミ', 'ファ', 'ソ', 'ラ', 'シ', '高ド']; // 白鍵盤のキー
             const blackKeys = ['ド#', 'レ#', 'ファ#', 'ソ#', 'ラ#']; // 黒鍵盤のキー
 
             const keyWidth = Math.min(60, window.innerWidth / (whiteKeys.length + 0.65)); // 鍵盤の幅を画面幅に合わせる
-            const whiteKeyHeight = 140; // 白鍵盤の高さ
+            const whiteKeyHeight = window.innerHeight > 320 ? 160 : window.innerHeight / 2; // 白鍵盤の高さ
             const blackKeyHeight = whiteKeyHeight * 2 / 3; // 黒鍵盤の高さ（白鍵盤の3分の2）
 
             // 鍵盤を画面に配置するための計算
             const totalKeys = whiteKeys.length;
             const startX = window.innerWidth / 2 - ((keyWidth - 4) * totalKeys) / 2;
-            const startY = window.innerHeight / 2 + whiteKeyHeight;
+            const startY = window.innerHeight / 2;
 
             // 白鍵盤を描画
             whiteKeys.forEach((key, index) => {
@@ -73,10 +119,11 @@
                 // 黒い線で囲む
                 keyShape.setStrokeStyle(2, 0x000000); // 線の太さと色を設定
 
-                // クリック処理などを記述する場合はここに追加
+                // クリック処理
                 keyShape.on('pointerdown', () => {
                     console.log('Key clicked:', key);
-                    // 音を鳴らす、モチーフを表示するなどのロジックを追加
+                    playSound(noteFrequencies[key]); // 音を鳴らす
+                    // モチーフを表示するなどのロジックを追加
                 });
             });
 
@@ -90,10 +137,11 @@
                     const keyShape = this.add.rectangle(keyX, startY - whiteKeyHeight / 6, keyWidth * 0.7, blackKeyHeight, 0x000000);
                     keyShape.setInteractive();
                     
-                    // クリック処理などを記述する場合はここに追加
+                    // クリック処理
                     keyShape.on('pointerdown', () => {
                         console.log('Key clicked:', key);
-                        // 音を鳴らす、モチーフを表示するなどのロジックを追加
+                        playSound(noteFrequencies[key]); // 音を鳴らす
+                        // モチーフを表示するなどのロジックを追加
                     });
                 }
             });
