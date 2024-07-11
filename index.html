@@ -55,14 +55,14 @@
             const whiteKeys = ['ド', 'レ', 'ミ', 'ファ', 'ソ', 'ラ', 'シ', 'ド']; // 白鍵盤のキー
             const blackKeys = ['ド#', 'レ#', 'ファ#', 'ソ#', 'ラ#']; // 黒鍵盤のキー
 
-            const keyWidth = 60; // 鍵盤の幅
-            const whiteKeyHeight = 200; // 白鍵盤の高さ
+            const keyWidth = Math.min(60, window.innerWidth / (whiteKeys.length + 0.65)); // 鍵盤の幅を画面幅に合わせる
+            const whiteKeyHeight = 140; // 白鍵盤の高さ
             const blackKeyHeight = whiteKeyHeight * 2 / 3; // 黒鍵盤の高さ（白鍵盤の3分の2）
 
             // 鍵盤を画面に配置するための計算
             const totalKeys = whiteKeys.length;
-            const startX = window.innerWidth / 2 - (keyWidth * totalKeys) / 2;
-            const startY = window.innerHeight / 2;
+            const startX = window.innerWidth / 2 - ((keyWidth - 4) * totalKeys) / 2;
+            const startY = window.innerHeight / 2 + whiteKeyHeight;
 
             // 白鍵盤を描画
             whiteKeys.forEach((key, index) => {
@@ -80,13 +80,12 @@
                 });
             });
 
-
             // 黒鍵盤を描画
             blackKeys.forEach((key, index) => {
                 const whiteKeyIndex = [0, 1, 3, 4, 5][index]; // 対応する白鍵盤のインデックスを取得
 
                 if (whiteKeyIndex !== undefined) {
-                    const whiteKeyX = startX - 7 + whiteKeyIndex * keyWidth;
+                    const whiteKeyX = startX - 6 + whiteKeyIndex * keyWidth;
                     const keyX = whiteKeyX + keyWidth * 0.65; // 黒鍵盤の幅を調整して配置
                     const keyShape = this.add.rectangle(keyX, startY - whiteKeyHeight / 6, keyWidth * 0.7, blackKeyHeight, 0x000000);
                     keyShape.setInteractive();
