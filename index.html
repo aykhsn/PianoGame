@@ -203,13 +203,22 @@
         }
 
         function createHeartPoints(size) {
-            return [
-                { x: 0, y: -size / 2 },
-                { x: size / 2, y: -size / 6 },
-                { x: size / 6, y: size / 2 },
-                { x: -size / 6, y: size / 2 },
-                { x: -size / 2, y: -size / 6 }
-            ];
+            const heartPoints = [];
+            const xOffset = 0;
+            const yOffset = 0;
+            for (let deg = 0; deg <= 180; deg += 1) {
+                const rad = Phaser.Math.DegToRad(deg);
+                const x = size * 0.5 * Math.pow(Math.sin(rad), 3);
+                const y = -size * 0.5 * (0.8125 * Math.cos(rad) - 0.3125 * Math.cos(2 * rad) - 0.125 * Math.cos(3 * rad) - 0.0625 * Math.cos(4 * rad));
+                heartPoints.push({ x: x + xOffset, y: y + yOffset });
+            }
+            for (let deg = 180; deg >= 0; deg -= 1) {
+                const rad = Phaser.Math.DegToRad(deg);
+                const x = -size * 0.5 * Math.pow(Math.sin(rad), 3);
+                const y = -size * 0.5 * (0.8125 * Math.cos(rad) - 0.3125 * Math.cos(2 * rad) - 0.125 * Math.cos(3 * rad) - 0.0625 * Math.cos(4 * rad));
+                heartPoints.push({ x: x + xOffset, y: y + yOffset });
+            }
+            return heartPoints;
         }
 
         function createBird(scene) {
