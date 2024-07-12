@@ -96,11 +96,16 @@
 
             // カラフルなモチーフを生成
             createMotif(scene);
+
+            // ランダムに鳥を飛び出す
+            if (Math.random() < 0.1) { // 10%の確率で鳥を飛び出す
+                createBird(scene);
+            }
         }
 
         function preload() {
             // ここで必要なリソースを読み込む
-            // 今回は特に何も読み込まないので空のまま
+            this.load.image('bird', 'pikopo.svg'); // 鳥の画像をロード
         }
 
         function createMotif(scene) {
@@ -207,18 +212,36 @@
             ];
         }
 
+        function createBird(scene) {
+            const bird = scene.add.sprite(scene.cameras.main.centerX, scene.cameras.main.centerY, 'bird');
+            bird.setScale(0.2); // 鳥のサイズを調整
+            bird.setDepth(-1); // 鍵盤の背面に配置
+
+            scene.tweens.add({
+                targets: bird,
+                x: { value: Phaser.Math.Between(-50, scene.sys.game.config.width + 150), duration: 6000 },
+                y: { value: Phaser.Math.Between(-50, scene.sys.game.config.height + 150), duration: 6000 },
+                alpha: { value: 0, duration: 4000 },
+                rotation: { value: 6.28, duration: 6000 }, // 2πラジアン (360度) 回転
+                ease: 'Cubic.easeOut',
+                onComplete: () => {
+                    bird.destroy();
+                }
+            });
+        }
+
         function create() {
             // ここでピアノの鍵盤を作成するロジックを記述する
             const whiteKeys = ['ド', 'レ', 'ミ', 'ファ', 'ソ', 'ラ', 'シ', '高ド']; // 白鍵盤のキー
             const blackKeys = ['ド#', 'レ#', 'ファ#', 'ソ#', 'ラ#']; // 黒鍵盤のキー
 
-            const keyWidth = Math.min(60, window.innerWidth / (whiteKeys.length + 0.65)); // 鍵盤の幅を画面幅に合わせる
-            const whiteKeyHeight = window.innerHeight > 320 ? 160 : window.innerHeight / 2; // 白鍵盤の高さ
+            const keyWidth = Math.min(80, window.innerWidth / (whiteKeys.length + 0.65)); // 鍵盤の幅を画面幅に合わせる
+            const whiteKeyHeight = window.innerHeight > 320 ?  keyWidth * 4 : window.innerHeight / 2; // 白鍵盤の高さ
             const blackKeyHeight = whiteKeyHeight * 2 / 3; // 黒鍵盤の高さ（白鍵盤の3分の2）
 
             // 鍵盤を画面に配置するための計算
             const totalKeys = whiteKeys.length;
-            const startX = window.innerWidth / 2 - ((keyWidth - 4) * totalKeys) / 2;
+            const startX = window.innerWidth / 2 - ((keyWidth) * totalKeys) / 2 + (keyWidth / 2);
             const startY = window.innerHeight / 2;
 
             // 白鍵盤を描画
